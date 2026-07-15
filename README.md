@@ -79,11 +79,30 @@ from the portal.
 
 ```bash
 git clone https://github.com/flint-pete/sage-hermes-brain.git
+rm -rf ~/.hermes/skills/sage-waggle          # remove any previous copy first
 cp -r sage-hermes-brain/skills/sage-waggle ~/.hermes/skills/
 # in a Hermes session:  /reload-skills
 ```
 
-To update later, `git pull` in the clone and re-copy (then `/reload-skills`).
+> **Why the `rm -rf` first?** If `~/.hermes/skills/sage-waggle` already exists,
+> `cp -r` does NOT replace it — it *merges* into it: same-named files are
+> overwritten, but files that were **removed upstream stay behind as stale
+> orphans**, leaving a corrupt hybrid whose reference index no longer matches the
+> files on disk. Removing the old copy first guarantees a clean install. (Skip the
+> `rm -rf` only on a first-ever install when the directory doesn't exist yet.)
+
+**To update later** (after upstream changes), do a clean re-sync — don't just
+re-`cp` over the top:
+
+```bash
+cd sage-hermes-brain && git pull
+rsync -a --delete skills/sage-waggle/ ~/.hermes/skills/sage-waggle/   # mirror exactly, drop orphans
+# in a Hermes session:  /reload-skills
+```
+
+(`rsync -a --delete` mirrors the source exactly — it removes files that no longer
+exist upstream, so you never accumulate stale references. If you don't have
+`rsync`, use `rm -rf ~/.hermes/skills/sage-waggle` then `cp -r` as above.)
 
 ### B) Skill tap — NOT currently usable for this skill
 
