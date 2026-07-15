@@ -1,0 +1,20 @@
+# Never commit secrets or personal data into this shared bundle.
+# This bundle is intentionally credential-free; keep it that way.
+
+# Hermes runtime / secrets (should never be here, but guard anyway)
+.env
+.env.*
+auth.json
+*.token
+*token*.txt
+secrets/
+**/secrets/
+
+# Local/editor cruft
+.DS_Store
+*.swp
+*~
+__pycache__/
+*.pyc
+.venv/
+venv/

@@ -1,0 +1,74 @@
+How Hermes shares skills + a starting point for other users
+
+Hermes is built for sharing skills. The unit of sharing is a skill
+(self-contained markdown + optional references//templates//scripts/),
+and there are three levels of "starting point" you can hand someone.
+
+The golden rule (this is the one thing to internalize) Share
+KNOWLEDGE, never your raw profile. Never tar ~/.hermes or hermes
+profile export for someone else — that carries your API keys (.env),
+OAuth tokens (auth.json), every private conversation (sessions/,
+state.db), and PII-laden memory (phone numbers, private emails, node
+creds). The recipient always brings their own keys and memory; you
+give them capabilities.
+
+What you actually do — three mechanisms
+
+1. Publish individual skills (the simplest)
+
+   bash
+   hermes skills publish skills/my-skill --to github --repo owner/repo
+
+   Others then install with hermes skills install <url-or-id>.
+
+2. A "tap" = your repo as a skill source (the reusable channel)
+
+   bash
+   you publish skills into a repo, then others add it as a tap:
+   hermes skills tap add <owner>/<repo>
+   hermes skills install <skill-name>
+
+Once tapped, they can search and install any skill in your repo, and
+hermes skills update pulls your later improvements. This is the "give
+my team a growing library" path.
+
+3. A knowledge bundle (a full "starting point" — you've done this before)
+
+A git repo shaped like:
+
+    <bundle>/
+      skills/<skill>/       your authored skills (SKILL.md + references/…)
+      docs/                 curated design/context docs
+      MEMORY.starter.md     hand-written, PII-FREE domain facts to optionally seed
+      README.md             install + smoke-test + first-task instructions
+      .gitignore            guards .env, auth.json, token, secrets/
+
+The recipient adopts it into their own Hermes. You already have
+exactly this — ~/AI-projects/sage-hermes-brain/ (skills/, docs/,
+MEMORY.starter.md, README.md). That's the model.
+
+The mandatory step before ANYTHING leaves the machine Sanitize the
+whole tree for secrets + PII — and scan references//scripts/ too, not
+just SKILL.md (detail files carry the most copies of a
+credential). Scan for: your phone number, private emails ,
+tokens/Bearer values, camera passwords, literal password=<value>,
+secret-file paths, and ssh user@node-XXXX host+user combos. Replace
+with placeholders (CAMERA_PASSWORD, <YOUR_TOKEN_FILE>,
+USER@node-<VSN>) and note "get real values from your
+instructor/owner."
+
+Bonus: blueprints (skills that self-schedule)
+A skill can carry a metadata.hermes.blueprint: block with a cron schedule. When someone installs it, Hermes offers it as a **suggested
+cron job** (opt-in via /suggestions accept) — so you can share not just knowledge but ready-to-run automations.
+
+To let others adopt it — they run:
+
+   bash
+   git clone https://github.com/flint-pete/sage-hermes-brain.git
+   cp -r sage-hermes-brain/skills/sage-waggle ~/.hermes/skills/   # then /reload-skills
+   optionally: cat sage-hermes-brain/MEMORY.starter.md >> ~/.hermes/memories/MEMORY.md
+
+   (They bring their own API key + run hermes setup first.)
+
+   To make it a tap (so hermes skills install works + auto-updates) — the repo just needs to be a recognized skill source; then
+   people do hermes skills tap add flint-pete/sage-hermes-brain.
