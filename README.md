@@ -75,28 +75,41 @@ from the portal.
 
 ## Install the skill (two ways)
 
-### A) Skill tap (recommended — stays updatable)
-
-Point Hermes at this repo as a skill source, then install:
-
-```bash
-hermes skills tap add flint-pete/sage-hermes-brain
-hermes skills install sage-waggle
-hermes skills list          # confirm it's there
-```
-
-Later, pull updates with:
-```bash
-hermes skills check && hermes skills update
-```
-
-### B) Direct copy (quick, no tap)
+### A) Direct copy (recommended — works today)
 
 ```bash
 git clone https://github.com/flint-pete/sage-hermes-brain.git
 cp -r sage-hermes-brain/skills/sage-waggle ~/.hermes/skills/
 # in a Hermes session:  /reload-skills
 ```
+
+To update later, `git pull` in the clone and re-copy (then `/reload-skills`).
+
+### B) Skill tap — NOT currently usable for this skill
+
+You might expect the Hermes tap flow to work:
+
+```bash
+hermes skills tap add flint-pete/sage-hermes-brain
+hermes skills install sage-waggle      # ← this FAILS for this skill
+```
+
+It doesn't, and that's expected. Hub/tap installs run every skill through a
+**security scanner**, and any skill installed from a non-official ("community")
+source that earns a **"dangerous"** verdict is hard-blocked — `--force` cannot
+override a dangerous verdict. `sage-waggle` is a hands-on **edge-ops** skill: it
+documents dozens of real `sudo pluginctl`, `docker build`, `k3s import`,
+`rm -rf` cleanup, and `curl -H "Authorization: ..."` commands. Those are exactly
+the patterns the scanner flags (privilege-escalation / destructive / supply-chain
+/ exfiltration), so it scores "dangerous" and the tap install is refused. The
+findings are legitimate documentation, not malware — but the scanner can't tell
+the difference from an untrusted source, and the instructional commands can't be
+removed from `SKILL.md` (which is always scanned) without gutting the skill.
+
+**So use the direct copy above.** A plain file copy into `~/.hermes/skills/` does
+not invoke the scanner, and you get the full skill (SKILL.md + ~90 references).
+(If you later want the updatable tap experience, that requires the skill being
+published from a trusted/official source — not available for this community repo.)
 
 ## Verify it loaded (smoke test)
 
